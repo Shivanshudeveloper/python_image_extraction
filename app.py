@@ -15,7 +15,8 @@ WASABI_ACCESS_KEY = '7G39M9EQWMF4Q4A3XZ49'
 WASABI_SECRET_KEY = 'T11fpIiRMpDI2G9lL9n6jGan5IUaWUelnPmPVnEb'
 WASABI_BUCKET_NAME = 'testleading'
 
-engine = create_engine('postgresql://tsdbadmin:hm87vy2trrbags36@nt51y7xqhs.knrrchtp81.tsdb.cloud.timescale.com:36489/tsdb')
+# engine = create_engine('postgres://tsdbadmin:hm87vy2trrbags36@nt51y7xqhs.knrrchtp81.tsdb.cloud.timescale.com:36489/tsdb')
+engine = create_engine('postgresql://tsdbadmin:nnbndcdsnnkfemu5@g15kroocga.ied5mx5496.tsdb.cloud.timescale.com:33332/tsdb')
 
 app = Flask(__name__)
 scheduler_started = False
@@ -204,9 +205,9 @@ def upload_image():
         with open(local_image_path, 'wb') as image_file:
             image_file.write(image_data)
         # Update the status of the fetched img_name to "true" (assuming you want to mark it as processed)
-        # update_query = text("UPDATE img_info SET status = 'true' WHERE img_name = :img_name")
-        # session.execute(update_query, params={"img_name": img_name})  # Use params to pass parameters
-        # session.commit()  # Commit the transaction
+        update_query = text("UPDATE img_info SET status = 'true' WHERE img_name = :img_name")
+        session.execute(update_query, params={"img_name": img_name})  # Use params to pass parameters
+        session.commit()  # Commit the transaction
         session.close()
 
         # return jsonify({'img_name': img_name}), 200
@@ -244,7 +245,7 @@ def upload_image():
             # Call the function to remove unwanted words
             clean_words_array = remove_unwanted_words_from_array(short_words_array)
             final_string = " ".join(clean_words_array)
-            print("Successfully got the text")
+            print("Successfully got the text",final_string)
             response_data = {
                     'img_name': img_name,
                     'extracted_text':final_string
@@ -269,7 +270,7 @@ def upload_image():
             except requests.exceptions.RequestException as e:
                 return jsonify({'error': f'Request failed: {e}'}), 500
 
-            # return jsonify({'userData': clean_names_and_titles_array}), 200
+            return jsonify({'userData': clean_names_and_titles_array}), 200
 
         else:
             print(f"No text could be extracted from")
