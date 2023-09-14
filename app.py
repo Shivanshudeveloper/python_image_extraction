@@ -10,13 +10,15 @@ import schedule
 import time
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker  # Import sessionmaker
-
-WASABI_ACCESS_KEY = '7G39M9EQWMF4Q4A3XZ49'
-WASABI_SECRET_KEY = 'T11fpIiRMpDI2G9lL9n6jGan5IUaWUelnPmPVnEb'
-WASABI_BUCKET_NAME = 'testleading'
+from dotenv import load_dotenv
+load_dotenv()
+# Access the environment variables using the Config object
+WASABI_ACCESS_KEY = os.getenv('WASABI_ACCESS_KEY')
+WASABI_SECRET_KEY = os.getenv('WASABI_SECRET_KEY')
+WASABI_BUCKET_NAME = os.getenv('WASABI_BUCKET_NAME')
 
 # engine = create_engine('postgres://tsdbadmin:hm87vy2trrbags36@nt51y7xqhs.knrrchtp81.tsdb.cloud.timescale.com:36489/tsdb')
-engine = create_engine('postgresql://tsdbadmin:nnbndcdsnnkfemu5@g15kroocga.ied5mx5496.tsdb.cloud.timescale.com:33332/tsdb')
+engine = create_engine(os.getenv('POSTGRES_URI'))
 
 app = Flask(__name__)
 scheduler_started = False
@@ -24,7 +26,7 @@ scheduler_started = False
 
 s3_client = boto3.client(
     's3',
-    endpoint_url='https://s3.ap-northeast-1.wasabisys.com',  # Wasabi S3 endpoint
+    endpoint_url=os.getenv('S3_ENDPOINT'),  # Wasabi S3 endpoint
     aws_access_key_id=WASABI_ACCESS_KEY,
     aws_secret_access_key=WASABI_SECRET_KEY
 )
@@ -205,8 +207,8 @@ def upload_image():
         with open(local_image_path, 'wb') as image_file:
             image_file.write(image_data)
         # Update the status of the fetched img_name to "true" (assuming you want to mark it as processed)
-        update_query = text("UPDATE img_info SET status = 'true' WHERE img_name = :img_name")
-        session.execute(update_query, params={"img_name": img_name})  # Use params to pass parameters
+        # update_query = text("UPDATE img_info SET status = 'true' WHERE img_name = :img_name")
+        # session.execute(update_query, params={"img_name": img_name})  # Use params to pass parameters
         session.commit()  # Commit the transaction
         session.close()
 
@@ -258,7 +260,7 @@ def upload_image():
 
             try:
                 # Send the array as a JSON payload in the POST request
-                response = requests.post(server_url, json={"userData": clean_names_and_titles_array, "userId":img_name.split("-")[1].split(".")[0]})
+                response = requests.post(server_url, json={"userData": clean_names_and_titles_array, "userId":img_name})
 
                 # Check the response from the server
                 if response.status_code == 200:
@@ -270,7 +272,7 @@ def upload_image():
             except requests.exceptions.RequestException as e:
                 return jsonify({'error': f'Request failed: {e}'}), 500
 
-            return jsonify({'userData': clean_names_and_titles_array}), 200
+            # return jsonify({'userData': clean_names_and_titles_array}), 200
 
         else:
             print(f"No text could be extracted from")
