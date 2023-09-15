@@ -207,8 +207,8 @@ def upload_image():
         with open(local_image_path, 'wb') as image_file:
             image_file.write(image_data)
         # Update the status of the fetched img_name to "true" (assuming you want to mark it as processed)
-        # update_query = text("UPDATE img_info SET status = 'true' WHERE img_name = :img_name")
-        # session.execute(update_query, params={"img_name": img_name})  # Use params to pass parameters
+        update_query = text("UPDATE img_info SET status = 'true' WHERE img_name = :img_name")
+        session.execute(update_query, params={"img_name": img_name})  # Use params to pass parameters
         session.commit()  # Commit the transaction
         session.close()
 
