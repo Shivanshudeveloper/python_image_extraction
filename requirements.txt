@@ -1,0 +1,9 @@
+Flask
+Pillow
+pytesseract
+SQLAlchemy
+Boto3
+Requests
+schedule
+python-dotenv
+psycopg2-binary
